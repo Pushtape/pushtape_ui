@@ -416,8 +416,7 @@ function pushtape_ui_field_formatter_view($entity_type, $entity, $field, $instan
  *  In our case we need to get the node id from: Track Name (NID)
  *  So we just use the preg match part to get the NID we want, and print the title
  *  in the multiform widget.
- *  TODO: Avoid these kind of workarounds.
- *
+ *  TODO: Avoid these kind of workarounds. maybe figure out what this module really does and why
  */
 function pushtape_ui_get_related_track_id($element) {
   // If a value was entered into the autocomplete...
