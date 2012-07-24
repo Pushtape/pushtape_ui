@@ -26,7 +26,7 @@ function pushtape_ui_apps_app_info() {
   );
 }
 
-/** 
+/**
  * App Configuration Form
  */
 function pushtape_ui_configure_form($form, &$form_state) {
@@ -229,7 +229,7 @@ function pushtape_ui_theme() {
 
 /**
  * Override of theme_field_multiple_value_form()
- *    
+ *
  *  Modify default nodereference multiple list output for albums to
  *  only allow sorting.
  *  @todo This feels fragile, is there a better way to sort and store
@@ -407,4 +407,29 @@ function pushtape_ui_field_formatter_view($entity_type, $entity, $field, $instan
       break;
   }
   return $element;
+}
+/**
+ *  Code borrowed from _entityreference_autocomplete_validate
+ *  We need to use this because the multiform widget for entity reference
+ *  uses the format ENTITY NAME (ENTITY ID)
+ *  In our case we need to get the node id from: Track Name (NID)
+ *  So we just use the preg match part to get the NID we want, and print the title
+ *  in the multiform widget.
+ *  TODO: Avoid these kind of workarounds. maybe figure out what this module really does and why
+ */
+function pushtape_ui_get_related_track_id($element) {
+  // If a value was entered into the autocomplete...
+  $value = '';
+  if (!empty($element['#value'])) {
+    // Take "label (entity id)', match the id from parenthesis.
+    if (preg_match("/.+\((\d+)\)/", $element['#value'], $matches)) {
+      $value = $matches[1];
+    }
+    else {
+      // We have an unexpected situation...parenthesis are missing.
+    }
+  }
+  // Update the value of this element so the field can validate the product IDs.
+  //form_set_value($element, $value, $form_state);
+  return $value;
 }
