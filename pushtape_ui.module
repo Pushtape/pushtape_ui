@@ -163,8 +163,8 @@ function pushtape_ui_track_node_form_submit($form, &$form_state) {
       $old_album = node_load($form_state['values']['field_album_previous_value']);
       $filtered = array();
       foreach ($old_album->field_tracklist[LANGUAGE_NONE] as $key => $value) {
-        if ($value['nid'] != $track_id) {
-          $filtered[$key]['nid'] = $value['nid'];
+        if ($value['target_id'] != $track_id) {
+          $filtered[$key]['target_id'] = $value['target_id'];
         }
       }
       $old_album->field_tracklist[LANGUAGE_NONE] = $filtered;
@@ -179,16 +179,16 @@ function pushtape_ui_track_node_form_submit($form, &$form_state) {
         $filtered = array();
         $exists = FALSE;
         foreach ($this_album->field_tracklist[LANGUAGE_NONE] as $key => $value) {
-          if ($value['nid'] == $track_id) {
+          if ($value['target_id'] == $track_id) {
             $exists = TRUE;
           }
         }
         if (!$exists) {
-          $this_album->field_tracklist[LANGUAGE_NONE][$delta]['nid'] = $track_id;
+          $this_album->field_tracklist[LANGUAGE_NONE][$delta]['target_id'] = $track_id;
         }
       }
       else {
-        $this_album->field_tracklist[LANGUAGE_NONE][$delta]['nid'] = $track_id;
+        $this_album->field_tracklist[LANGUAGE_NONE][$delta]['target_id'] = $track_id;
       }
       node_save($this_album);
     }
@@ -226,18 +226,18 @@ function pushtape_ui_theme() {
   );
 }
 
+  /**
+   *  Modify default nodereference multiple list output for albums to
+   *  only allow sorting.
+   *  @todo This feels fragile, is there a better way to sort and store
+   *  track order?
+   */
 
 /**
  * Override of theme_field_multiple_value_form()
- *
- *  Modify default nodereference multiple list output for albums to
- *  only allow sorting.
- *  @todo This feels fragile, is there a better way to sort and store
- * track order?
-
-
+ * TODO: Avoid these kind of workarounds/hacks.
+*/
 function theme_pushtape_ui_field_multiple_value_form($variables) {
-
   $element = $variables['element'];
   $output = '';
   if ($element['#cardinality'] > 1 || $element['#cardinality'] == FIELD_CARDINALITY_UNLIMITED) {
@@ -271,7 +271,8 @@ function theme_pushtape_ui_field_multiple_value_form($variables) {
     // Add the items as table rows.
     foreach ($items as $key => $item) {
       if ($item['target_id']['#default_value']) {
-        $track = node_load($item['target_id']['#default_value']);
+        $track_id = pushtape_ui_get_related_track_id($item['target_id']);
+        $track = node_load($track_id);
         $item['_weight']['#attributes']['class'] = array($order_class);
         $delta_element = drupal_render($item['_weight']);
         $cells = array(
@@ -307,7 +308,6 @@ function theme_pushtape_ui_field_multiple_value_form($variables) {
   }
   return $output;
 }
- */
 
 /**
  * Implements hook_node_view().
@@ -341,19 +341,19 @@ function pushtape_ui_node_load($nodes, $types) {
           $node->field_artwork = $album->field_artwork;
           $pushtape_ui_override[] = 'field_artwork';
         }
-        if (!empty($album->field_artist_term)) {
-          if (empty($node->field_artist_term)) {
-          $node->field_artist_term = $album->field_artist_term;
-          $pushtape_ui_override[] = 'field_artist_term';
+        if (!empty($album->field_artist)) {
+          if (empty($node->field_artist)) {
+          $node->field_artist = $album->field_artist;
+          $pushtape_ui_override[] = 'field_artist';
           }
         }
-         if (!empty($album->field_release_date)) {
+/*         if (!empty($album->field_release_date)) {
              if (empty($node->field_release_date)) {
           $node->field_release_date = $album->field_release_date;
           $pushtape_ui_override[] = 'field_release_date';
            }
         }
-        $node->pushtape_ui_override = $pushtape_ui_override;
+*/        $node->pushtape_ui_override = $pushtape_ui_override;
       }
     }
   }
@@ -397,7 +397,8 @@ function pushtape_ui_field_formatter_view($entity_type, $entity, $field, $instan
     case 'pushtape_ui_ol_view':
       $rows = array();
       foreach ($items as $delta => $item) {
-        $rows[] = l($item['node']->title, 'node/' . $item['nid']);
+        $node = node_load($item['target_id']);
+        $rows[] = l($node->title, 'node/' . $item['target_id']);
       }
       $element[0] = array(
         '#theme' => 'item_list',
