@@ -7,7 +7,6 @@ version = 7.x-1.0-alpha2
 dependencies[] = entity
 dependencies[] = views
 dependencies[] = features
-dependencies[] = pushtape_discography
 stylesheets[all][] = css/pushtape_ui.css
 scripts[] = js/pushtape_ui.js
 files[] = pushtape_ui.module
