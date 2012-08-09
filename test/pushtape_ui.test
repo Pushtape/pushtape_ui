@@ -1,0 +1,40 @@
+<?php
+// $Id$
+
+/**
+* Unit tests for Pushtape Discography module.
+*/
+class PushtapeUITest extends DrupalTestCase {
+
+  /**
+   * Drupal SimpleTest method: return metadata about the test.
+   */
+  function get_info() {
+    return array(
+      'name'  => t('Pushtape UI'),
+      'desc'  => t('Executes test suite for Pushtape UI module.'),
+      'group' => t('Pushtape UI'),
+    );
+  }
+}
+
+/**
+ * Test that we can inherit from album
+ */
+function testInherit() {
+    // TODO: Put some code here.
+}
+
+/**
+ * Test that we can create Albums from track form
+ */
+function testNewalbum() {
+    // TODO: Put some code here.
+}
+
+/**
+ * Test that we can sort tracks
+ */
+function testSorttracklist() {
+    // TODO: Put some code here.
+}
