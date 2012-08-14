@@ -1,7 +1,7 @@
 api = 2
 core=7.x
 
-projects[ctools][version] = 1.0
+projects[ctools][version] = 1.1
 projects[ctools][subdir] = contrib
 projects[ctools][type] = module
 
@@ -9,7 +9,7 @@ projects[features][version] = 1.0
 projects[features][subdir] = contrib
 projects[features][type] = module
 
-projects[pathauto][version] = 1.1
+projects[pathauto][version] = 1.2
 projects[pathauto][subdir] = contrib
 projects[pathauto][type] = module
 projects[pathauto][patch][936222] = http://drupal.org/files/936222-pathauto-persist.patch
