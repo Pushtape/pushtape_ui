@@ -22,7 +22,7 @@ projects[views][version] = 3.3
 projects[views][type] = module
 projects[views][subdir] = contrib
 
-projects[token][version] = 1.1
+projects[token][version] = 1.2
 projects[token][subdir] = contrib
 
 projects[entity][version] = 1.0-rc3
