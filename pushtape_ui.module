@@ -6,14 +6,14 @@
  */
 
 /**
- * Implementation of hook_init().
+ * Implements hook_init().
  */
 function pushtape_ui_init() {
 
 }
 
 /**
- * Implementation of hook_form_alter().
+ * Implements hook_form_alter().
  */
 function pushtape_ui_form_alter(&$form, &$form_state, $form_id) {
   switch ($form_id) {
@@ -180,7 +180,7 @@ function pushtape_ui_album_node_form_submit($form, &$form_state) {
 
 
 /**
-  * Implementation of hook_menu_alter()
+  * Implements hook_menu_alter()
   * Remember to clear the menu cache after adding/editing this function.
   */
 function pushtape_ui_menu_alter(&$items) {
@@ -191,7 +191,7 @@ function pushtape_ui_menu_alter(&$items) {
 
 
 /**
- * Implementation of hook_theme()
+ * Implements hook_theme()
  */
 function pushtape_ui_theme() {
   return array(
@@ -288,7 +288,7 @@ function theme_pushtape_ui_field_multiple_value_form($variables) {
 
 
 /**
- * Implementation of hook_node_view().
+ * Implements hook_node_view().
  */
 function pushtape_ui_preprocess_node(&$vars) {
   // Let's setup some variables to make theming a bit easier.
@@ -300,7 +300,7 @@ function pushtape_ui_preprocess_node(&$vars) {
 }
 
 /**
- * Implementation of hook_node_load().
+ * Implements hook_node_load().
  */
 
 function pushtape_ui_node_load($nodes, $types) {
@@ -335,7 +335,7 @@ function pushtape_ui_node_load($nodes, $types) {
 
 
 /**
- *  Implementation of hook_node_prepare().
+ *  Implements hook_node_prepare().
  */
 function pushtape_ui_node_prepare($node) {
   // Make sure overridden track fields are empty on the edit form
