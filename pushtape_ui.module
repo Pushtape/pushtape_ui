@@ -11,6 +11,19 @@
 function pushtape_ui_init() {
 
 }
+/**
+ * Implements hook_apps_servers_info()
+ */
+function pushtape_core_apps_servers_info() {
+  $info =  drupal_parse_info_file(drupal_get_path('module', 'pushtape_core') . '/pushtape_core.info');
+  return array(
+    'pushtape' => array(
+      'title' => 'pushtape',
+      'description' => 'Apps for pushtape',
+      'manifest' => (empty($info['version']) || $info['version'] == '7.x-1.x-dev') ? 'http://apps.rosenstrauch.com/pushtape-dev' : 'http://apps.rosenstrauch.com/pushtape',
+    ),
+  );
+}
 
 
 /**
