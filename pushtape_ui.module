@@ -14,8 +14,8 @@ function pushtape_ui_init() {
 /**
  * Implements hook_apps_servers_info()
  */
-function pushtape_core_apps_servers_info() {
-  $info =  drupal_parse_info_file(drupal_get_path('module', 'pushtape_core') . '/pushtape_core.info');
+function pushtape_ui_apps_servers_info() {
+  $info =  drupal_parse_info_file(drupal_get_path('profile', 'pushtape') . '/pushtape.info');
   return array(    
     'pushtape' => array(
       'title' => 'Pushtape',
