@@ -20,7 +20,7 @@ function pushtape_ui_apps_servers_info() {
     'pushtape' => array(
       'title' => 'Pushtape',
       'description' => "Apps for Pushtape",
-      'manifest' => 'http://www.apps.rosenstrauch.com/app/query/pushtape',
+      'manifest' => 'http://apps.pushtape.openlearninglabs.org/app/query/pushtape',
       'profile_version' => isset($info['version']) ? $info['version'] : '7.x-1.x-panels',
       'server_name' => $_SERVER['SERVER_NAME'],
       'server_ip' => $_SERVER['SERVER_ADDR'],
