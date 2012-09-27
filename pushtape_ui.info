@@ -1,7 +1,7 @@
 core = 7.x
 description = A discography publishing platform. Easily publish albums or single tracks.
 name = Pushtape UI
-package = Pushtape
+package = Panopoly Apps
 project = pushtape_ui
 version = 7.x-1.0-alpha2
 dependencies[] = entity
