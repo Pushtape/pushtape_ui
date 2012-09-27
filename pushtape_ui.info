@@ -1,9 +1,9 @@
 core = 7.x
 description = A discography publishing platform. Easily publish albums or single tracks.
 name = Pushtape UI
-package = Pushtape
+package = Panopoly Apps
 project = pushtape_ui
-version = 7.x-1.0-alpha3
+version = 7.x-1.x-dev
 dependencies[] = entity
 dependencies[] = views
 dependencies[] = features
@@ -14,3 +14,4 @@ files[] = css/pushtape_ui.css
 files[] = js/pushtape_ui.js
 files[] = test/pushtape_ui.test
 project status url = http://updates.drupal.org/release-history/pushtape_ui/7.x
+apps[server] = http://apps.pushtape.openlearninglabs.org/app/query/pushtape
