@@ -5,6 +5,7 @@ package = Panopoly Apps
 project = pushtape_ui
 version = 7.x-1.x-dev
 dependencies[] = entity
+dependencies[] = panopoly_core
 dependencies[] = views
 dependencies[] = features
 stylesheets[all][] = css/pushtape_ui.css
