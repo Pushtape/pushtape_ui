@@ -32,19 +32,20 @@ function pushtape_ui_form_alter(&$form, &$form_state, $form_id) {
        * $form['field_new_album'] - field used to create a new album node, not stored
        * $form['field_album_previous_value'] - hidden field used in _submit handler, not stored
        *
-       * $form['field_album_artwork_checkbox'] - General UI toggle, not stored
+       * $form['field_artwork_checkbox'] - General UI toggle, not stored
        *
        * See pushtape.js for client side manipulation of these elements
        */
       
       // Add a little UI checkbox for the artwork.
-      $form['field_album_artwork_checkbox'] = array(
+      $form['field_artwork_checkbox'] = array(
         '#title' => t('Add track artwork'),
         '#type' => 'checkbox',
         '#default_value' => !empty($node->field_artwork),
         '#description' => t('(If no track artwork is present, album artwork will be used.)'),
         '#weight' => $form['field_artwork']['#weight'] - .1, // this weight trick is used to position the checkbox just above the element.
       );
+      $form['field_artwork']['#states'] = array('visible' => array(':input[name="field_artwork_checkbox"]' => array('checked' => TRUE)));
       $form['field_artwork']['#prefix'] = '<div class="upload-artwork indent">';
       $form['field_artwork']['#suffix'] = '</div>';
       
@@ -59,6 +60,8 @@ function pushtape_ui_form_alter(&$form, &$form_state, $form_id) {
       // Put the new album option at the bottom.
       unset($form['field_album'][LANGUAGE_NONE]['#options']['_none']);
       $form['field_album'][LANGUAGE_NONE]['#options']['_none'] = t('- New album -');
+      $form['field_album']['#states'] = array('visible' => array(':input[name="field_album_checkbox"]' => array('checked' => TRUE)));
+
 
       // Create a new form element to enable new album creation
       $form['new_album'] = array(
@@ -69,6 +72,12 @@ function pushtape_ui_form_alter(&$form, &$form_state, $form_id) {
         '#weight' => $form['field_album']['#weight'] + .1,
         '#size' => 15,
         '#description' => '(You will add more album info in the next step.)',
+        '#states' => array(
+          'visible' => array(
+            ':input[name="field_album_checkbox"]' => array('checked' => TRUE),  
+            ':input[name="field_album[und]"]' => array('value' => '_none'),  // TODO: broken!
+          )
+         ),
       );
       // Store the previous album in a hidden field, so we can compare it later with
       // field_album and see if it has changed

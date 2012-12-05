@@ -5,7 +5,11 @@ Drupal.behaviors.pushtape = {
   attach: function (context, settings) {
     //START
     
+  
+    
     //Album Artwork toggle
+    // DEPRECATED :: same thing implemented in pushtape_ui.module using #states    
+    /*
     if ($('.node-track-form input#edit-field-album-artwork-checkbox').is(':checked') == false) {
       $('.node-track-form #edit-field-artwork').hide();  
     }
@@ -17,9 +21,12 @@ Drupal.behaviors.pushtape = {
          else {
            $('#edit-field-artwork').hide();
          }
-    });    
+    });
+    */
     
     // Show/Hide Album Creation fields
+    // DEPRECATED :: same thing implemented in pushtape_ui.module using #states    
+    /*
     if ($('input#edit-field-album-checkbox').is(':checked') == false) {
       $('.album-wrap').hide();  
     }
@@ -32,8 +39,11 @@ Drupal.behaviors.pushtape = {
            $('.album-wrap').hide();
          }
     });
+    */
 
     // Show the new album field if selected in dropdown, hide otherwise.
+    // DEPRECATED :: same thing implemented in pushtape_ui.module using #states
+    /*
     var album = $('select#edit-field-album-und').val();
     if (album == '_none') {
       $('.new-album').show();  
@@ -49,6 +59,7 @@ Drupal.behaviors.pushtape = {
         $('.new-album').hide();  
       }
     });
+    */
     
     //END
   }
