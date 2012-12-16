@@ -386,14 +386,58 @@ function pushtape_ui_node_prepare($node) {
 function pushtape_ui_field_formatter_info() {
   return array(
     // the key must be unique, so it's best to prefix with your module's name.
-    'pushtape_ui_ol_view' => array(
-      // the label is is what is displayed in the select box in the UI.
-      'label' => t('Ordered list of linked titles'),
-      // field types is the important bit!! List the field types your formatter is for.
+    'pushtape_ui_tracklist_view' => array(
+      'label' => t('Pushtape: Tracklist View'),
       'field types' => array('entityreference'),
+      'settings' => array('view_name' => 'pushtape_ordered_list'), 
     ),
   );
 }
+
+/**
+ * Implements hook_field_formatter_settings_form().
+ */
+function pushtape_ui_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
+  //This gets the view_mode where our settings are stored
+  $display = $instance['display'][$view_mode];
+  //This gets the actual settings
+  $settings = $display['settings'];
+  //Initialize the element variable
+  $element = array();
+  
+  // TODO: Check if views is enabled first...?
+  $views = views_get_all_views();
+  $view_options['pushtape_ordered_list'] = t('Default - Ordered list of linked titles');
+  foreach ($views as $name => $view) {
+    // Load up all views tagged with "pushtape" as options
+    if (!$view->disabled &&  $view->tag == 'pushtape') {
+      $view_options[$name] = 'View: ' . $view->human_name . ' (' . $view->name .')';
+    }
+  }
+  
+  //Add select box
+  $element['view_name'] = array(
+    '#type'           => 'select',                           // Use a select box widget
+    '#title'          => t('Tracklist view'),                   // Widget label
+    '#description'    => t('Select how you would like to display the tracklist view. You can select a custom View for your tracklist here.'), // Helper text
+    '#default_value'  => $settings['view_name'],              // Get the value if it's already been set
+    '#options'        => $view_options,
+  );
+  return $element;
+}
+
+/**
+ * Implements hook_field_formatter_settings_summary().
+ */
+function pushtape_ui_field_formatter_settings_summary($field, $instance, $view_mode) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+  $summary = t('Tracklist view: "@view"', array(
+    '@view'     => $settings['view_name'],
+  )); // we use t() for translation and placeholders to guard against attacks
+  return $summary;
+}
+
 
 /**
  * Implements hook_field_formatter_view()
@@ -402,17 +446,25 @@ function pushtape_ui_field_formatter_view($entity_type, $entity, $field, $instan
   $element = array();
   $settings = $display['settings'];
   switch ($display['type']) {
-    case 'pushtape_ui_ol_view':
-      $rows = array();
-      foreach ($items as $delta => $item) {
-        $node = node_load($item['target_id']);
-        $rows[] = l($node->title, 'node/' . $item['target_id']);
+    case 'pushtape_ui_tracklist_view':    
+      if ($settings['view_name'] != 'pushtape_ordered_list') {
+        // Load up a custom view
+        $view = views_embed_view($settings['view_name']);
+        $element[0]['#markup'] = $view;
       }
-      $element[0] = array(
-        '#theme' => 'item_list',
-        '#items' => $rows,
-        '#type' => 'ol',
-      );
+      else {
+        // Output our default ordered list instead of loading up a view.
+        $rows = array();
+        foreach ($items as $delta => $item) {
+          $node = node_load($item['target_id']);
+          $rows[] = l($node->title, 'node/' . $item['target_id']);
+        }
+        $element[0] = array(
+          '#theme' => 'item_list',
+          '#items' => $rows,
+          '#type' => 'ol',
+        );          
+      }
       break;
   }
   return $element;
