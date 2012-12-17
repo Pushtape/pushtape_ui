@@ -1,6 +1,8 @@
 core = 7.x
 description = A discography publishing platform. Easily publish albums or single tracks.
 name = Pushtape UI
+package = Pushtape
+project = pushtape_ui
 version = 7.x-1.x-dev
 dependencies[] = entity
 dependencies[] = views
@@ -12,9 +14,6 @@ files[] = css/pushtape_ui.css
 files[] = js/pushtape_ui.js
 files[] = test/pushtape_ui.test
 project status url = http://updates.drupal.org/release-history/pushtape_ui/7.x
-name = "Pushtape UI"
-package = "Pushtape"
-project = "pushtape_ui"
 stylesheets[all][] = css/pushtape.css
 scripts[] = js/pushtape.js
 
