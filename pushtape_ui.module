@@ -11,50 +11,6 @@
 function pushtape_ui_init() {
 
 }
-/**
- * Implements hook_apps_servers_info()
- */
-function pushtape_ui_apps_servers_info() {
-  $info =  drupal_parse_info_file(drupal_get_path('module', 'pushtape') . '/pushtape.info');
-  return array(    
-    'pushtape' => array(
-      'title' => 'Pushtape',
-      'description' => "Apps for Pushtape",
-      'manifest' => 'http://apps.pushtape.openlearninglabs.org/app/query/pushtape',
-      'profile_version' => isset($info['version']) ? $info['version'] : '7.x-1.x-panels',
-      'server_name' => $_SERVER['SERVER_NAME'],
-      'server_ip' => $_SERVER['SERVER_ADDR'],
-    ),
-  );
-}
-
-
-/**
- * Implements hook_apps_app_info()
- */
-function pushtape_ui_apps_app_info() {
-  return array(
-    // 'demo content description' => 'This tells what add demo content will do it is placed on the configure form',
-    'demo content module' => 'pushtape_ui_democontent',
-    'configure form' => 'pushtape_ui_configure_form',
-    // 'post install callback' => 'appname_app_post_install', // This will be called after the app is enabled intialy or of the app has been uninstalled
-    // 'status callback' => 'appname_app_status'
-  );
-}
-
-/**
- * App Configuration Form
- */
-function pushtape_ui_configure_form($form, &$form_state) {
-  $form = array();
-
-  $form['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Save'),
-  );
-
-   return $form;
-}
 
 /**
  * Implements hook_form_alter().
@@ -63,7 +19,8 @@ function pushtape_ui_form_alter(&$form, &$form_state, $form_id) {
   switch ($form_id) {
     case 'page_node_form':
       // automatically make menu link
-      $form['menu']['enabled']['#default_value'] = 1;
+      // disabling this, not sure if it makes sense at the moment.
+      //$form['menu']['enabled']['#default_value'] = 1;
       break;
     case 'track_node_form':
       $node = $form['#node'];
@@ -71,24 +28,27 @@ function pushtape_ui_form_alter(&$form, &$form_state, $form_id) {
        * Album fields
        *
        * $form['field_album_checkbox'] - General UI field to force empty value, not stored
-       * $form['field_album'] - main noderef field that stores the album id
+       * $form['field_album'] - main entity reference field that stores the album id
        * $form['field_new_album'] - field used to create a new album node, not stored
        * $form['field_album_previous_value'] - hidden field used in _submit handler, not stored
        *
-       * $form['field_album_artwork_checkbox'] - General UI toggle, not stored
+       * $form['field_artwork_checkbox'] - General UI toggle, not stored
        *
        * See pushtape.js for client side manipulation of these elements
        */
+      
       // Add a little UI checkbox for the artwork.
-      $form['field_album_artwork_checkbox'] = array(
+      $form['field_artwork_checkbox'] = array(
         '#title' => t('Add track artwork'),
         '#type' => 'checkbox',
         '#default_value' => !empty($node->field_artwork),
         '#description' => t('(If no track artwork is present, album artwork will be used.)'),
-        '#weight' => $form['field_artwork']['#weight'] - .1,
+        '#weight' => $form['field_artwork']['#weight'] - .1, // this weight trick is used to position the checkbox just above the element.
       );
+      $form['field_artwork']['#states'] = array('visible' => array(':input[name="field_artwork_checkbox"]' => array('checked' => TRUE)));
       $form['field_artwork']['#prefix'] = '<div class="upload-artwork indent">';
       $form['field_artwork']['#suffix'] = '</div>';
+      
       // Add a UI checkbox for the album field
       $form['field_album_checkbox'] = array(
         '#title' => t('Part of an album'),
@@ -100,6 +60,8 @@ function pushtape_ui_form_alter(&$form, &$form_state, $form_id) {
       // Put the new album option at the bottom.
       unset($form['field_album'][LANGUAGE_NONE]['#options']['_none']);
       $form['field_album'][LANGUAGE_NONE]['#options']['_none'] = t('- New album -');
+      $form['field_album']['#states'] = array('visible' => array(':input[name="field_album_checkbox"]' => array('checked' => TRUE)));
+
 
       // Create a new form element to enable new album creation
       $form['new_album'] = array(
@@ -110,6 +72,12 @@ function pushtape_ui_form_alter(&$form, &$form_state, $form_id) {
         '#weight' => $form['field_album']['#weight'] + .1,
         '#size' => 15,
         '#description' => '(You will add more album info in the next step.)',
+        '#states' => array(
+          'visible' => array(
+            ':input[name="field_album_checkbox"]' => array('checked' => TRUE),  
+            ':input[name="field_album[und]"]' => array('value' => '_none'),  // TODO: broken!
+          )
+         ),
       );
       // Store the previous album in a hidden field, so we can compare it later with
       // field_album and see if it has changed
@@ -219,12 +187,37 @@ function pushtape_ui_album_node_form_submit($form, &$form_state) {
 
 }
 
+/**
+ * Implements hook_menu().
+ */
+function pushtape_ui_menu() {
+
+  $items['user/%user/logout'] = array(
+    'title' => 'Log out', 
+    'access callback' => 'user_is_logged_in', 
+    'page callback' => 'pushtape_user_logout_redirect', 
+    'weight' => 10, 
+    'type' => MENU_LOCAL_TASK,    
+  );
+  
+  return $items;
+}
+
+function pushtape_user_logout_redirect() {
+  drupal_goto('user/logout');  
+}
+
+function pushtape_user_logout() {
+  $_GET['destination'] = 'user';  
+}
+
 
 /**
   * Implements hook_menu_alter()
   * Remember to clear the menu cache after adding/editing this function.
   */
 function pushtape_ui_menu_alter(&$items) {
+
   // Add a delete tab to nodes
   $items['node/%node']['type'] = MENU_CALLBACK;
   unset($items['node/%node/delete']['context']);
@@ -242,12 +235,13 @@ function pushtape_ui_theme() {
   );
 }
 
+
   /**
    *  Modify default nodereference multiple list output for albums to
    *  only allow sorting.
-   *  @todo This feels fragile, is there a better way to sort and store
-   *  track order?
-   */
+    * @todo This feels fragile, is there a better way to sort and store
+    * track order?
+  */
 
 /**
  * Override of theme_field_multiple_value_form()
@@ -285,7 +279,7 @@ function theme_pushtape_ui_field_multiple_value_form($variables) {
     usort($items, '_field_sort_items_value_helper');
 
     // Add the items as table rows.
-    foreach ($items as $key => $item) {
+    foreach ($items as $key => $item) {      
       if ($item['target_id']['#default_value']) {
         $track_id = pushtape_ui_get_related_track_id($item['target_id']);
         $track = node_load($track_id);
@@ -323,7 +317,9 @@ function theme_pushtape_ui_field_multiple_value_form($variables) {
     }
   }
   return $output;
+
 }
+
 
 /**
  * Implements hook_node_view().
@@ -357,19 +353,15 @@ function pushtape_ui_node_load($nodes, $types) {
           $node->field_artwork = $album->field_artwork;
           $pushtape_ui_override[] = 'field_artwork';
         }
-        if (!empty($album->field_artist)) {
-          if (empty($node->field_artist)) {
+        if (empty($node->field_artist)) {
           $node->field_artist = $album->field_artist;
           $pushtape_ui_override[] = 'field_artist';
-          }
         }
-/*         if (!empty($album->field_release_date)) {
-             if (empty($node->field_release_date)) {
+        /*if (empty($node->field_release_date)) {
           $node->field_release_date = $album->field_release_date;
           $pushtape_ui_override[] = 'field_release_date';
-           }
-        }
-*/        $node->pushtape_ui_override = $pushtape_ui_override;
+        }*/
+        $node->pushtape_ui_override = $pushtape_ui_override;
       }
     }
   }
@@ -394,37 +386,91 @@ function pushtape_ui_node_prepare($node) {
 function pushtape_ui_field_formatter_info() {
   return array(
     // the key must be unique, so it's best to prefix with your module's name.
-    'pushtape_ui_ol_view' => array(
-      // the label is is what is displayed in the select box in the UI.
-      'label' => t('Ordered list of linked titles'),
-      // field types is the important bit!! List the field types your formatter is for.
+    'pushtape_ui_tracklist_view' => array(
+      'label' => t('Pushtape: Tracklist View'),
       'field types' => array('entityreference'),
+      'settings' => array('view_name' => 'pushtape_ordered_list'), 
     ),
   );
 }
 
 /**
- * Implements hook_field_formatter_view().
+ * Implements hook_field_formatter_settings_form().
+ */
+function pushtape_ui_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
+  //This gets the view_mode where our settings are stored
+  $display = $instance['display'][$view_mode];
+  //This gets the actual settings
+  $settings = $display['settings'];
+  //Initialize the element variable
+  $element = array();
+  
+  // TODO: Check if views is enabled first...?
+  $views = views_get_all_views();
+  $view_options['pushtape_ordered_list'] = t('Default - Ordered list of linked titles');
+  foreach ($views as $name => $view) {
+    // Load up all views tagged with "pushtape" as options
+    if (!$view->disabled &&  $view->tag == 'pushtape') {
+      $view_options[$name] = 'View: ' . $view->human_name . ' (' . $view->name .')';
+    }
+  }
+  
+  //Add select box
+  $element['view_name'] = array(
+    '#type'           => 'select',                           // Use a select box widget
+    '#title'          => t('Tracklist view'),                   // Widget label
+    '#description'    => t('Select how you would like to display the tracklist view. You can select a custom View for your tracklist here.'), // Helper text
+    '#default_value'  => $settings['view_name'],              // Get the value if it's already been set
+    '#options'        => $view_options,
+  );
+  return $element;
+}
+
+/**
+ * Implements hook_field_formatter_settings_summary().
+ */
+function pushtape_ui_field_formatter_settings_summary($field, $instance, $view_mode) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+  $summary = t('Tracklist view: "@view"', array(
+    '@view'     => $settings['view_name'],
+  )); // we use t() for translation and placeholders to guard against attacks
+  return $summary;
+}
+
+
+/**
+ * Implements hook_field_formatter_view()
  */
 function pushtape_ui_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
   $element = array();
   $settings = $display['settings'];
   switch ($display['type']) {
-    case 'pushtape_ui_ol_view':
-      $rows = array();
-      foreach ($items as $delta => $item) {
-        $node = node_load($item['target_id']);
-        $rows[] = l($node->title, 'node/' . $item['target_id']);
+    case 'pushtape_ui_tracklist_view':    
+      if ($settings['view_name'] != 'pushtape_ordered_list') {
+        // Load up a custom view
+        $view = views_embed_view($settings['view_name']);
+        $element[0]['#markup'] = $view;
       }
-      $element[0] = array(
-        '#theme' => 'item_list',
-        '#items' => $rows,
-        '#type' => 'ol',
-      );
+      else {
+        // Output our default ordered list instead of loading up a view.
+        $rows = array();
+        foreach ($items as $delta => $item) {
+          $node = node_load($item['target_id']);
+          $rows[] = l($node->title, 'node/' . $item['target_id']);
+        }
+        $element[0] = array(
+          '#theme' => 'item_list',
+          '#items' => $rows,
+          '#type' => 'ol',
+        );          
+      }
       break;
   }
   return $element;
 }
+
+
 /**
  *  Code borrowed from _entityreference_autocomplete_validate
  *  We need to use this because the multiform widget for entity reference
@@ -432,7 +478,8 @@ function pushtape_ui_field_formatter_view($entity_type, $entity, $field, $instan
  *  In our case we need to get the node id from: Track Name (NID)
  *  So we just use the preg match part to get the NID we want, and print the title
  *  in the multiform widget.
- *  TODO: Avoid these kind of workarounds. maybe figure out what this module really does and why
+ *  TODO: Avoid these kind of workarounds.
+ *
  */
 function pushtape_ui_get_related_track_id($element) {
   // If a value was entered into the autocomplete...
