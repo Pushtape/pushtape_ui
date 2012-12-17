@@ -16,5 +16,3 @@ files[] = test/pushtape_ui.test
 project status url = http://updates.drupal.org/release-history/pushtape_ui/7.x
 stylesheets[all][] = css/pushtape.css
 scripts[] = js/pushtape.js
-
-
