@@ -6,26 +6,6 @@
  */
 
 /**
-<<<<<<< HEAD
-=======
-* Implements hook_apps_servers_info()
-*/
-function pushtape_ui_apps_servers_info() {
-  $info = drupal_parse_info_file(drupal_get_path('module', 'pushtape') . '/pushtape.info');
-  return array(
-    'pushtape' => array(
-      'title' => 'Pushtape',
-      'description' => "Apps for Pushtape",
-      'manifest' => 'http://apps.pushtape.openlearninglabs.org/app/query/pushtape',
-      'profile_version' => isset($info['version']) ? $info['version'] : '7.x-1.x-panels',
-      'server_name' => $_SERVER['SERVER_NAME'],
-      'server_ip' => $_SERVER['SERVER_ADDR'],
-    ),
-  );
-}
-
-/**
->>>>>>> 3cbd0b6870bc48be03696ca268c709788918f056
  * Implements hook_init().
  */
 function pushtape_ui_init() {
@@ -387,7 +367,6 @@ function pushtape_ui_node_load($nodes, $types) {
       if (!empty($node->field_album)) {
         // Load Album
         $album = node_load($node->field_album[LANGUAGE_NONE][0]['target_id']);
-<<<<<<< HEAD
         // Find shared fields between track and album nodes.
         $shared_fields = array_keys(pushtape_ui_shared_fields());
         // Pull which fields to override from config
@@ -402,21 +381,6 @@ function pushtape_ui_node_load($nodes, $types) {
         }
         // We add an override flag to the node object to signal a field override.
         // Override, Autoload, Inherit - confusing?
-=======
-        $pushtape_ui_override = array();
-        if (empty($node->field_artwork)) {
-          $node->field_artwork = $album->field_artwork;
-          $pushtape_ui_override[] = 'field_artwork';
-        }
-        if (empty($node->field_artist)) {
-          $node->field_artist = $album->field_artist;
-          $pushtape_ui_override[] = 'field_artist';
-        }
-        if (empty($node->field_release_date)) {
-          $node->field_release_date = $album->field_release_date;
-          $pushtape_ui_override[] = 'field_release_date';
-        }
->>>>>>> 3cbd0b6870bc48be03696ca268c709788918f056
         $node->pushtape_ui_override = $pushtape_ui_override;
       }
     }
@@ -474,7 +438,6 @@ function pushtape_ui_field_formatter_settings_form($field, $instance, $view_mode
   //Initialize the element variable
   $element = array();
   
-<<<<<<< HEAD
   // Safe fallback if Views is disabled
   $view_options['pushtape_ordered_list'] = t('Default - Ordered list of linked titles');
       
@@ -486,15 +449,6 @@ function pushtape_ui_field_formatter_settings_form($field, $instance, $view_mode
       if (!$view->disabled &&  $view->tag == 'pushtape') {
         $view_options[$name] = 'View: ' . $view->human_name . ' (' . $view->name .')';
       }
-=======
-  // TODO: Check if views is enabled first...?
-  $views = views_get_all_views();
-  $view_options['pushtape_ordered_list'] = t('Default - Ordered list of linked titles');
-  foreach ($views as $name => $view) {
-    // Load up all views tagged with "pushtape" as options
-    if (!$view->disabled &&  $view->tag == 'pushtape') {
-      $view_options[$name] = 'View: ' . $view->human_name . ' (' . $view->name .')';
->>>>>>> 3cbd0b6870bc48be03696ca268c709788918f056
     }
   }
   
@@ -517,11 +471,7 @@ function pushtape_ui_field_formatter_settings_summary($field, $instance, $view_m
   $settings = $display['settings'];
   $summary = t('Tracklist view: "@view"', array(
     '@view'     => $settings['view_name'],
-<<<<<<< HEAD
   )); 
-=======
-  )); // we use t() for translation and placeholders to guard against attacks
->>>>>>> 3cbd0b6870bc48be03696ca268c709788918f056
   return $summary;
 }
 
@@ -534,11 +484,7 @@ function pushtape_ui_field_formatter_view($entity_type, $entity, $field, $instan
   $settings = $display['settings'];
   switch ($display['type']) {
     case 'pushtape_ui_tracklist_view':    
-<<<<<<< HEAD
       if ($settings['view_name'] != 'pushtape_ordered_list' && module_exists('views')) {
-=======
-      if ($settings['view_name'] != 'pushtape_ordered_list') {
->>>>>>> 3cbd0b6870bc48be03696ca268c709788918f056
         // Load up a custom view
         $view = views_embed_view($settings['view_name']);
         $element[0]['#markup'] = $view;
