@@ -1,3 +1,29 @@
+<<<<<<< HEAD
+core = "7.x"
+description = "A helper module for the Pushtape distribution. Provides workflow enhancements and UI improvements."
+name = "Pushtape UI"
+package = "Pushtape"
+project = "pushtape_ui"
+version = "7.x-1.0"
+
+stylesheets[all][] = css/pushtape.css
+scripts[] = js/pushtape.js
+
+
+; Information added by drupal.org packaging script on 2012-07-23
+version = "7.x-1.x-dev"
+core = "7.x"
+project = "pushtape_ui"
+datestamp = "1343047835"
+
+
+; Information added by drupal.org packaging script on 2013-03-22
+version = "7.x-1.0-alpha3"
+core = "7.x"
+project = "pushtape_ui"
+datestamp = "1363937130"
+
+=======
 core = 7.x
 description = A discography publishing platform. Easily publish albums or single tracks.
 name = Pushtape UI
@@ -16,3 +42,4 @@ files[] = test/pushtape_ui.test
 project status url = http://updates.drupal.org/release-history/pushtape_ui/7.x
 stylesheets[all][] = css/pushtape.css
 scripts[] = js/pushtape.js
+>>>>>>> 3cbd0b6870bc48be03696ca268c709788918f056
