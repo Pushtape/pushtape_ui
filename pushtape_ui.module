@@ -6,6 +6,8 @@
  */
 
 /**
+<<<<<<< HEAD
+=======
 * Implements hook_apps_servers_info()
 */
 function pushtape_ui_apps_servers_info() {
@@ -23,6 +25,7 @@ function pushtape_ui_apps_servers_info() {
 }
 
 /**
+>>>>>>> 3cbd0b6870bc48be03696ca268c709788918f056
  * Implements hook_init().
  */
 function pushtape_ui_init() {
@@ -107,9 +110,27 @@ function pushtape_ui_form_alter(&$form, &$form_state, $form_id) {
       $form['actions']['submit']['#submit'][] = 'pushtape_ui_track_node_form_submit';
       break;
     case 'album_node_form':
-
       $form['field_tracklist'][LANGUAGE_NONE]['#theme'] = 'pushtape_ui_field_multiple_value_form';
       $form['actions']['submit']['#submit'][] = 'pushtape_ui_album_node_form_submit';
+      break;
+    case 'node_type_form':
+      // Make inherited fields configurable on track edit page.
+      if ($form['#node_type']->type == 'track') {
+        $form['pushtape_inherit'] = array(
+          '#type' => 'fieldset',
+          '#title' => 'Pushtape UI Settings',
+          '#collapsible' => TRUE,
+          '#collapsed' => TRUE,
+          '#group' => 'additional_settings',             
+          );
+        $form['pushtape_inherit']['pushtape_inherit_fields'] = array(
+          '#type' => 'checkboxes',
+          '#title' => t('Select which fields should autoload from album'),
+          '#options' => pushtape_ui_shared_fields(),
+          '#default_value' => variable_get('pushtape_inherit_fields_track', array('field_artist', 'field_artwork', 'field_release_date')),
+          '#description' => 'When a track field is empty, attempt to load the information from the associated album node. ',
+        );
+      }
       break;
     default:
   }
@@ -364,7 +385,24 @@ function pushtape_ui_node_load($nodes, $types) {
   foreach ($nodes as $node) {
     if ($node->type == 'track') {
       if (!empty($node->field_album)) {
+        // Load Album
         $album = node_load($node->field_album[LANGUAGE_NONE][0]['target_id']);
+<<<<<<< HEAD
+        // Find shared fields between track and album nodes.
+        $shared_fields = array_keys(pushtape_ui_shared_fields());
+        // Pull which fields to override from config
+        $include =  variable_get('pushtape_inherit_fields_track', array('field_artist', 'field_artwork', 'field_release_date'));
+        // When loading a track node, if track field is empty load from associated album node field.
+        $pushtape_ui_override = array();        
+        foreach($shared_fields as $field) {
+          if (empty($node->$field) && in_array($field, $include)) {
+            $node->$field = $album->$field;
+            $pushtape_ui_override[] = $field;
+          }            
+        }
+        // We add an override flag to the node object to signal a field override.
+        // Override, Autoload, Inherit - confusing?
+=======
         $pushtape_ui_override = array();
         if (empty($node->field_artwork)) {
           $node->field_artwork = $album->field_artwork;
@@ -378,12 +416,26 @@ function pushtape_ui_node_load($nodes, $types) {
           $node->field_release_date = $album->field_release_date;
           $pushtape_ui_override[] = 'field_release_date';
         }
+>>>>>>> 3cbd0b6870bc48be03696ca268c709788918f056
         $node->pushtape_ui_override = $pushtape_ui_override;
       }
     }
   }
 }
 
+
+/**
+ * Find shared fields between album and track nodes
+ */
+function pushtape_ui_shared_fields() {
+  $fields = array_intersect_key(field_info_instances('node', 'album'), field_info_instances('node', 'track'));
+  $shared = array();
+
+  foreach ($fields as $key => $value) {
+    $shared[$key] = $value['label'];
+  }
+  return $shared;
+}
 
 /**
  *  Implements hook_node_prepare().
@@ -422,6 +474,19 @@ function pushtape_ui_field_formatter_settings_form($field, $instance, $view_mode
   //Initialize the element variable
   $element = array();
   
+<<<<<<< HEAD
+  // Safe fallback if Views is disabled
+  $view_options['pushtape_ordered_list'] = t('Default - Ordered list of linked titles');
+      
+  // Add all views that are enabled and tagged with 'pushtape' as options
+  if (module_exists('views')) {
+    $views = views_get_all_views();
+    foreach ($views as $name => $view) {
+      // Load up all views tagged with "pushtape" as options
+      if (!$view->disabled &&  $view->tag == 'pushtape') {
+        $view_options[$name] = 'View: ' . $view->human_name . ' (' . $view->name .')';
+      }
+=======
   // TODO: Check if views is enabled first...?
   $views = views_get_all_views();
   $view_options['pushtape_ordered_list'] = t('Default - Ordered list of linked titles');
@@ -429,6 +494,7 @@ function pushtape_ui_field_formatter_settings_form($field, $instance, $view_mode
     // Load up all views tagged with "pushtape" as options
     if (!$view->disabled &&  $view->tag == 'pushtape') {
       $view_options[$name] = 'View: ' . $view->human_name . ' (' . $view->name .')';
+>>>>>>> 3cbd0b6870bc48be03696ca268c709788918f056
     }
   }
   
@@ -451,7 +517,11 @@ function pushtape_ui_field_formatter_settings_summary($field, $instance, $view_m
   $settings = $display['settings'];
   $summary = t('Tracklist view: "@view"', array(
     '@view'     => $settings['view_name'],
+<<<<<<< HEAD
+  )); 
+=======
   )); // we use t() for translation and placeholders to guard against attacks
+>>>>>>> 3cbd0b6870bc48be03696ca268c709788918f056
   return $summary;
 }
 
@@ -464,7 +534,11 @@ function pushtape_ui_field_formatter_view($entity_type, $entity, $field, $instan
   $settings = $display['settings'];
   switch ($display['type']) {
     case 'pushtape_ui_tracklist_view':    
+<<<<<<< HEAD
+      if ($settings['view_name'] != 'pushtape_ordered_list' && module_exists('views')) {
+=======
       if ($settings['view_name'] != 'pushtape_ordered_list') {
+>>>>>>> 3cbd0b6870bc48be03696ca268c709788918f056
         // Load up a custom view
         $view = views_embed_view($settings['view_name']);
         $element[0]['#markup'] = $view;
@@ -514,3 +588,30 @@ function pushtape_ui_get_related_track_id($element) {
   //form_set_value($element, $value, $form_state);
   return $value;
 }
+
+/**
+ * Better date defaults
+ */
+function pushtape_ui_date_formats() {
+  return array(
+    // January 2, 1980
+    array(
+      'type' => 'long', 
+      'format' => 'F j, Y', 
+      'locales' => array(),
+    ),
+    // Jan 2, 1980
+    array(
+      'type' => 'medium', 
+      'format' => 'M j, Y', 
+      'locales' => array(),
+    ),
+    // 1/2/1980
+    array(
+      'type' => 'short', 
+      'format' => 'n/j/Y', 
+      'locales' => array(),
+    ),
+  );
+}
+
