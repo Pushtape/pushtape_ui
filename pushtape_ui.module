@@ -107,7 +107,7 @@ function pushtape_ui_form_alter(&$form, &$form_state, $form_id) {
           '#type' => 'checkboxes',
           '#title' => t('Select which fields should autoload from album'),
           '#options' => pushtape_ui_shared_fields(),
-          '#default_value' => variable_get('pushtape_inherit_fields_track', array('field_artist', 'field_artwork', 'field_release_date')),
+          '#default_value' => variable_get('pushtape_inherit_fields_track', array('field_artist', 'field_artwork', 'field_label', 'field_release_date')),
           '#description' => 'When a track field is empty, attempt to load the information from the associated album node. ',
         );
       }
@@ -370,7 +370,7 @@ function pushtape_ui_node_load($nodes, $types) {
         // Find shared fields between track and album nodes.
         $shared_fields = array_keys(pushtape_ui_shared_fields());
         // Pull which fields to override from config
-        $include =  variable_get('pushtape_inherit_fields_track', array('field_artist', 'field_artwork', 'field_release_date'));
+        $include =  variable_get('pushtape_inherit_fields_track', array('field_artist', 'field_artwork', 'field_label', 'field_release_date'));
         // When loading a track node, if track field is empty load from associated album node field.
         $pushtape_ui_override = array();        
         foreach($shared_fields as $field) {
