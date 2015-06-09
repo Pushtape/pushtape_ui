@@ -1,9 +1,10 @@
-core = "7.x"
-description = "A helper module for the Pushtape distribution. Provides workflow enhancements and UI improvements."
-name = "Pushtape UI"
-package = "Pushtape"
-project = "pushtape_ui"
-version = "7.x-1.0"
+name = Pushtape UI
+description = A helper module for the Pushtape distribution. Provides workflow enhancements and UI improvements.
+core = 7.x
+package = Pushtape
+version = 7.x-1.0-beta22
+project = pushtape_ui
+
 
 stylesheets[all][] = css/pushtape.css
 
